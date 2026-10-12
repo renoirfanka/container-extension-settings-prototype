@@ -13,11 +13,6 @@ Keep the calculation logic, and anything that touches money (such as payment ord
 **What can be configured** (six rules per country), **who can configure it** (operations admins edit, everyone else views), and **what prevents invalid settings** (inline validation, preview, required reason, history with restore, conflict check).
 Tour: switch countries (Country D is incomplete) · edit a rule and watch the preview and day-by-day strip · try an invalid value · save with a reason and check History · press Restore · open the account menu and switch to the read-only viewer · open the page in two tabs and save in both to see the conflict message.
 Add `?demo=1` to the address for extra tools, or `?reset=1` to reset all data.
-## Design notes
-- The rules editor is the single hero; preview, save and history follow in reading order.
-- Plain-language labels and hints, so people outside shipping can use it.
-- Fixed-height inputs with reserved hint and error space keep fields aligned and rows steady.
-- Status and errors always use text and a shape, never colour alone.
 ## Assumptions
 - Limits 1–30 (free days), 1–60 (longest extension) and 1–5 (extensions allowed) are assumed guardrails.
 - Countries A, B and C count the arrival day as day 1 and every calendar day; Country D starts the day after arrival and skips Saturday and Sunday.
