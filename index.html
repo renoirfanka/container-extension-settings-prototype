@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Country rules · Container Extension Platform</title>
+<meta name="description" content="Set free days and extension rules per country for a container extension request platform.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231F3A5F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span>Container Extension Platform</span></div>
+    <div class="account">
+      <button type="button" class="account-button" id="account-button" aria-haspopup="true" aria-expanded="false" aria-controls="account-menu">
+        <span class="avatar" id="account-initials" aria-hidden="true">OA</span>
+        <span id="account-role">Operations admin</span>
+        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+      <div class="account-menu" id="account-menu" hidden>
+        <p class="account-signed" id="account-signed">Signed in as Operations admin</p>
+        <button type="button" class="menu-item" id="account-switch">Switch to read-only viewer</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page" id="main">
+  <h1>Country rules</h1>
+  <p class="page-intro">Set how free days and extensions work in each country. Changes apply to new requests only.</p>
+
+  <div class="tabs" role="tablist" aria-label="Countries" id="tabs"></div>
+  <p class="last-changed" id="last-changed"></p>
+  <div id="top-notice" aria-live="polite"></div>
+
+  <!-- Step 1 -->
+  <section class="step step-hero" id="step-1" aria-labelledby="step-1-title">
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">1</span>
+      <div>
+        <h2 id="step-1-title">Set the rules for Country A</h2>
+        <p class="step-intro">These rules decide how long an importer can keep a container at the port, and how they can extend it.</p>
+      </div>
+    </div>
+
+    <div id="viewer-notice" class="notice notice-info" hidden>
+      <span class="notice-mark" aria-hidden="true">i</span>
+      <span>You have view-only access. Only operations admins can change rules.</span>
+    </div>
+    <div id="incomplete-notice" class="notice notice-warn" hidden>
+      <span class="notice-mark" aria-hidden="true">!</span>
+      <span id="incomplete-text"></span>
+    </div>
+
+    <form id="rules-form" novalidate>
+      <div class="group">
+        <h3>Free time at the port</h3>
+        <p class="group-intro">Importers can keep a container at the port for free for a set number of days.</p>
+        <div class="grid">
+          <div class="field" data-field="freeDays">
+            <div class="label-row"><label for="in-freeDays">Free days</label><span class="needed" hidden>Needed</span></div>
+            <div class="control has-suffix">
+              <input id="in-freeDays" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-freeDays err-freeDays">
+              <span class="suffix" aria-hidden="true">days</span>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-freeDays">Days a container can stay at no charge. 1 to 30.</p>
+              <p class="error" id="err-freeDays"></p>
+            </div>
+          </div>
+
+          <div class="field" data-field="arrivalCountsAsDay1">
+            <div class="label-row"><span class="label" id="lbl-arrival">Counting starts</span></div>
+            <div class="control segmented" role="radiogroup" aria-labelledby="lbl-arrival" aria-describedby="hint-arrival">
+              <label><input type="radio" name="arrival" value="yes"><span>On arrival day</span></label>
+              <label><input type="radio" name="arrival" value="no"><span>Day after arrival</span></label>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-arrival">Whether the arrival day is the first free day.</p>
+              <p class="error" id="err-arrivalCountsAsDay1"></p>
+            </div>
+          </div>
+
+          <div class="field wide" data-field="excludedWeekdays" role="group" aria-labelledby="lbl-excluded" aria-describedby="sentence-excluded hint-excluded err-excludedWeekdays">
+            <div class="label-row"><span class="label" id="lbl-excluded">Days that don't count</span></div>
+            <div class="chips-row">
+              <div class="chips" id="chips"></div>
+              <div class="presets">
+                <button type="button" class="text-button" id="preset-weekends">Weekends</button>
+                <button type="button" class="text-button" id="preset-none">None</button>
+              </div>
+            </div>
+            <div class="below">
+              <p class="sentence" id="sentence-excluded" aria-live="polite"></p>
+              <p class="hint" id="hint-excluded">Ticked days don't use up free days. At least one day must still count.</p>
+              <p class="error" id="err-excludedWeekdays"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h3>Extensions</h3>
+        <p class="group-intro">When free days run out, importers can ask for more days.</p>
+        <div class="grid">
+          <div class="field" data-field="longestExtension">
+            <div class="label-row"><label for="in-longestExtension">Longest extension</label><span class="needed" hidden>Needed</span></div>
+            <div class="control has-suffix">
+              <input id="in-longestExtension" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-longestExtension err-longestExtension">
+              <span class="suffix" aria-hidden="true">days</span>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-longestExtension">Most days one request can add. 1 to 60.</p>
+              <p class="error" id="err-longestExtension"></p>
+            </div>
+          </div>
+
+          <div class="field" data-field="extensionsAllowed">
+            <div class="label-row"><label for="in-extensionsAllowed">Extensions allowed</label><span class="needed" hidden>Needed</span></div>
+            <div class="control has-suffix">
+              <input id="in-extensionsAllowed" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-extensionsAllowed err-extensionsAllowed">
+              <span class="suffix" aria-hidden="true">times</span>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-extensionsAllowed">How many times one container can be extended. 1 to 5.</p>
+              <p class="error" id="err-extensionsAllowed"></p>
+            </div>
+          </div>
+
+          <div class="field" data-field="approvalThreshold">
+            <div class="label-row"><label for="in-approvalThreshold">Approval needed above</label><span class="optional">Optional</span></div>
+            <div class="control has-suffix">
+              <input id="in-approvalThreshold" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-approvalThreshold err-approvalThreshold">
+              <span class="suffix" aria-hidden="true">days</span>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-approvalThreshold">Longer requests need a supervisor's OK. Leave empty for none.</p>
+              <p class="error" id="err-approvalThreshold"></p>
+            </div>
+          </div>
+
+          <div class="field" data-field="paymentOrder">
+            <div class="label-row"><span class="label" id="lbl-payment">Payment order</span></div>
+            <div class="control readonly-box" aria-labelledby="lbl-payment" aria-describedby="hint-payment">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+              <span class="payment-value"></span>
+            </div>
+            <div class="below">
+              <p class="hint" id="hint-payment">Set by the product team. It can't be changed here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Read-only view for viewers -->
+    <div id="readonly-view" hidden></div>
+  </section>
+
+  <!-- Step 2 -->
+  <section class="step" id="step-2" aria-labelledby="step-2-title">
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">2</span>
+      <div>
+        <h2 id="step-2-title">Check the result</h2>
+        <p class="step-intro">Pick a sample container to see what these rules mean for an importer.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <div class="label-row"><label for="pv-arrival">Container arrives</label></div>
+        <div class="control"><input id="pv-arrival" type="date"></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="pv-days">Importer asks for</label></div>
+        <div class="control has-suffix">
+          <input id="pv-days" type="text" inputmode="numeric" autocomplete="off" value="4">
+          <span class="suffix suffix-wide" aria-hidden="true">extra days</span>
+        </div>
+      </div>
+    </div>
+    <div class="results" id="results"></div>
+    <div class="strip-block">
+      <h3 class="strip-title" id="strip-title">Day by day</h3>
+      <div class="legend" id="legend">
+        <span class="legend-item"><span class="cell-swatch arrives" aria-hidden="true"></span>Arrives</span>
+        <span class="legend-item"><span class="cell-swatch free" aria-hidden="true"></span>Free day 1, 2, 3…</span>
+        <span class="legend-item"><span class="cell-swatch excluded" aria-hidden="true"></span>Doesn't count</span>
+        <span class="legend-item"><span class="cell-swatch extra" aria-hidden="true"></span>Extra day 1, 2, 3…</span>
+      </div>
+      <div class="strip-scroll" tabindex="0" role="region" aria-labelledby="strip-title">
+        <ol class="strip" id="strip"></ol>
+      </div>
+      <p class="strip-message" id="strip-message"></p>
+    </div>
+    <p class="footnote">This is a preview. Nothing is saved until you save your change.</p>
+  </section>
+
+  <!-- Step 3 -->
+  <section class="step" id="step-3" aria-labelledby="step-3-title">
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">3</span>
+      <div>
+        <h2 id="step-3-title">Save your change</h2>
+        <p class="step-intro">Check what is changing, say why, and save.</p>
+      </div>
+    </div>
+    <div id="save-banner" role="status"></div>
+    <p class="muted" id="no-changes">Change a rule above and your summary will appear here.</p>
+    <div id="changes-block" hidden>
+      <h3 class="small-heading">You're changing</h3>
+      <ul class="change-list" id="change-list"></ul>
+      <div class="field reason-field" data-field="reason">
+        <div class="label-row"><label for="in-reason">Reason for this change</label></div>
+        <div class="control"><input id="in-reason" type="text" autocomplete="off" placeholder="e.g. Port agency updated its counting rules" aria-describedby="hint-reason err-reason"></div>
+        <div class="below">
+          <p class="hint" id="hint-reason">Saved in the history so your team knows why.</p>
+          <p class="error" id="err-reason"></p>
+        </div>
+      </div>
+    </div>
+    <div id="error-summary" class="error-summary" tabindex="-1" hidden></div>
+    <div class="actions" id="save-actions">
+      <button type="button" class="button primary" id="save-button">Save changes</button>
+      <button type="button" class="button secondary" id="discard-button">Discard changes</button>
+    </div>
+  </section>
+
+  <!-- Step 4 -->
+  <section class="step" id="step-4" aria-labelledby="step-4-title">
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true" id="history-num">4</span>
+      <div class="step-head-main">
+        <h2 id="step-4-title">History</h2>
+        <p class="step-intro">Every saved change, newest first.</p>
+      </div>
+      <label class="switch"><input type="checkbox" id="all-countries"><span>Show all countries</span></label>
+    </div>
+    <div id="history-banner" role="status"></div>
+    <div id="history"></div>
+  </section>
+</main>
+
+<div class="unsaved-bar" id="unsaved-bar" hidden>
+  <div class="unsaved-inner">
+    <span id="unsaved-text"></span>
+    <button type="button" class="button secondary small" id="review-button">Review and save</button>
+  </div>
+</div>
+
+<dialog id="discard-dialog" aria-labelledby="discard-title">
+  <h2 id="discard-title" class="dialog-title"></h2>
+  <p class="muted">Your edits to this country haven't been saved.</p>
+  <div class="actions">
+    <button type="button" class="button secondary" id="keep-editing">Keep editing</button>
+    <button type="button" class="button secondary danger" id="confirm-discard">Discard changes</button>
+  </div>
+</dialog>
+
+<aside class="tools" id="tools" hidden aria-label="Tools">
+  <p class="tools-title">Tools</p>
+  <button type="button" class="button secondary small" id="tool-simulate">Simulate another admin saving</button>
+  <button type="button" class="button secondary small" id="tool-reset">Reset to starting values</button>
+</aside>
+
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
